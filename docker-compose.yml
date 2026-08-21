@@ -1,0 +1,18 @@
+# Local PostgreSQL for the future persistence adapter.
+# The MVP0 proof of concept runs entirely in memory and does NOT require this.
+# This database must never hold PHI.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cadence-overlay-pg
+    environment:
+      POSTGRES_USER: cadence
+      POSTGRES_PASSWORD: cadence_local_dev_only
+      POSTGRES_DB: cadence_overlay
+    ports:
+      - '5433:5432'
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+      - cadence_pg_data:/var/lib/postgresql/data
+volumes:
+  cadence_pg_data:

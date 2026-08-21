@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/domain" },
+    { "path": "./packages/rules-engine" },
+    { "path": "./packages/audit" },
+    { "path": "./packages/fixtures" },
+    { "path": "./packages/resolver" },
+    { "path": "./apps/api" }
+  ]
+}

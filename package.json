@@ -1,0 +1,46 @@
+{
+  "name": "cadence-overlay-resolver",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Safety-first proof of concept: constrained visit-type resolver on synthetic data. NOT FOR PHI.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "install:all": "npm install",
+    "dev": "concurrently -n api,web -c blue,magenta \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "npm run dev --workspace @cadence/api",
+    "dev:web": "npm run dev --workspace @cadence/web",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -b tsconfig.build.json",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
+    "test:e2e": "playwright test",
+    "eval": "tsx packages/resolver/src/eval/cli.ts",
+    "build": "npm run typecheck && npm run build --workspace @cadence/web",
+    "audit:deps": "npm audit --audit-level=high",
+    "audit:secrets": "tsx scripts/secret-scan.ts",
+    "ci": "npm run lint && npm run typecheck && npm run test && npm run eval -- --gate && npm run audit:secrets && npm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.7.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "concurrently": "^9.0.1",
+    "eslint": "^9.13.0",
+    "prettier": "^3.3.3",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.10.0",
+    "vite": "^5.4.9",
+    "vitest": "^2.1.3"
+  }
+}

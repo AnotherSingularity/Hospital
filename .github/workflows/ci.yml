@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      # Dependencies are pinned through the lockfile. `npm ci` fails if
+      # package.json and package-lock.json disagree.
+      - name: Install (locked)
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit and integration tests
+        run: npm run test
+
+      # Fails the build on any critical-rule bypass, invented identifier,
+      # cross-tenant access, or forbidden audit field. Gates are not negotiable:
+      # if one cannot pass, the correct action is to fix the resolver or report
+      # the failure, never to weaken the gate.
+      - name: Evaluation gates
+        run: npm run eval -- --gate
+
+      - name: Upload evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-report
+          path: .eval-out/
+
+      - name: Secret scan
+        run: npm run audit:secrets
+
+      - name: Dependency audit
+        run: npm run audit:deps
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install chromium --with-deps
+
+      - name: End-to-end tests
+        run: npm run test:e2e
